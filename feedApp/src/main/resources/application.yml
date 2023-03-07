@@ -1,11 +1,18 @@
 # Tomcat Server
 server:
-   port: 8080
-   
+  port: 8080
+
+# Logger
+logging.level:
+  web: DEBUG
+  '[com.bptn.feedapp]': DEBUG
+ 
+  
 # Active Profile
 spring:
   profiles:
     active: default
+    
     
 # Banner Text
   banner:
@@ -16,7 +23,6 @@ spring:
   jackson:
     time-zone: America/Toronto
     date-format: "yyyy-MM-dd HH:mm:ss" 
-    
     
 # Common Database Settings
   sql:
@@ -34,14 +40,8 @@ spring:
         '[format_sql]': true        
     hibernate:
       naming.physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-
-
-# Logger
-logging.level:
-  web: DEBUG
-  '[com.bptn.feedapp]': DEBUG
-  
-
+      
+      
 ---
 
 # Default Profile
@@ -60,3 +60,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+      
+      
