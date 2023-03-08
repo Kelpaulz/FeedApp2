@@ -28,5 +28,4 @@ user.setCreatedOn(rs.getTimestamp("createdOn"));
 /* Return the populated UserBean object */
 return user;
 	}
-
 }

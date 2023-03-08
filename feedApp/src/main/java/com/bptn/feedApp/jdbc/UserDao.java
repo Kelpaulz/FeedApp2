@@ -31,8 +31,7 @@ public class UserDao {
 	    logger.debug("Insert Query: {}", sql);
 	    /* Executes the Insert Statement */
 	    this.jdbcTemplate.update(sql, new Object[] { user.getFirstName(), user.getLastName(), user.getUsername(),
-	            user.getPhone(), user.getEmailId(), user.getPassword(), user.getEmailVerified(), user.getCreatedOn() });
-	
+	            user.getPhone(), user.getEmailId(), user.getPassword(), user.getEmailVerified(), user.getCreatedOn() });	
 
 	}
 }

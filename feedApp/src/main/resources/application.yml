@@ -60,5 +60,3 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-      
-      
