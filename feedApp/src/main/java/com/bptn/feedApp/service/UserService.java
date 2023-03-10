@@ -18,6 +18,9 @@ public class UserService {
 //	UserDao userDao;
 	@Autowired
 	UserRepository userRepository;
+	    
+	@Autowired
+	EmailService emailService;
 //	public List<UserBean> listUsers() {
 	public List<User> listUsers() {
 //		return this.userDao.listUsers();
