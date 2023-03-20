@@ -44,6 +44,7 @@ public class UserService {
 		user.setEmailVerified(false);
 		user.setCreatedOn(Timestamp.from(Instant.now()));
 		this.userRepository.save(user);
+		this.emailService.sendVerificationEmail(user);
 		return user;
 	}
 }

@@ -76,11 +76,4 @@ public void sendVerificationEmail(User user) {
 				      String.format("Welcome %s %s",user.getFirstName(),user.getLastName()), 
 				      this.provider.getClientVerifyExpiration());
 }	
-
-@EnableAsync
-@SpringBootApplication
-public class FeedAppApplication {
-
-
-}
 }
