@@ -8,5 +8,4 @@ public class EmailExistException extends RuntimeException {
 		super(message);
 
 	}
-
 }
