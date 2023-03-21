@@ -6,7 +6,6 @@ public class FeedNotUserException extends RuntimeException {
 
 	public FeedNotUserException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 
