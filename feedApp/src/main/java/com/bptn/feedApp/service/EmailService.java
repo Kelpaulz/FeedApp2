@@ -69,6 +69,7 @@ private void sendEmail(User user, String clientParam, String templateName, Strin
 			this.logger.error("Error while Sending Email, Username: " + user.getUsername(), ex);
 		}
 }
+
 @Async
 public void sendVerificationEmail(User user) {
 		
