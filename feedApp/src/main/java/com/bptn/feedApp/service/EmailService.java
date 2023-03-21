@@ -76,4 +76,10 @@ public void sendVerificationEmail(User user) {
 				      String.format("Welcome %s %s",user.getFirstName(),user.getLastName()), 
 				      this.provider.getClientVerifyExpiration());
 }	
+
+@Async
+public void sendResetPasswordEmail(User user) {
+		
+	this.sendEmail(user, this.provider.getClientResetParam(), "reset_password", "Reset your password", this.provider.getClientResetExpiration());
+}	
 }
