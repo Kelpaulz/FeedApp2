@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.bptn.feedApp.exception.domain.EmailExistException;
 import com.bptn.feedApp.exception.domain.EmailNotVerifiedException;
@@ -166,12 +169,52 @@ public class UserService {
 
 		this.userRepository.save(user);
 	}
+
 	public User getUser() {
 
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		/* Get User from the DB. */
 		return this.userRepository.findByUsername(username)
-	.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s",username)));
+				.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+	}
+
+	private void updateValue(Supplier<String> getter, Consumer<String> setter) {
+
+		Optional.ofNullable(getter.get())
+				// .filter(StringUtils::hasText)
+				.map(String::trim).ifPresent(setter);
+	}
+
+	private void updatePassword(Supplier<String> getter, Consumer<String> setter) {
+
+		Optional.ofNullable(getter.get()).filter(StringUtils::hasText).map(this.passwordEncoder::encode)
+				.ifPresent(setter);
+	}
+
+	private User updateUser(User user, User currentUser) {
+
+		this.updateValue(user::getFirstName, currentUser::setFirstName);
+		this.updateValue(user::getLastName, currentUser::setLastName);
+		this.updateValue(user::getPhone, currentUser::setPhone);
+		this.updateValue(user::getEmailId, currentUser::setEmailId);
+		this.updatePassword(user::getPassword, currentUser::setPassword);
+
+		return this.userRepository.save(currentUser);
+	}
+
+	public User updateUser(User user) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		/* Validates the new email if provided */
+		this.userRepository.findByEmailId(user.getEmailId()).filter(u -> !u.getUsername().equals(username))
+				.ifPresent(u -> {
+					throw new EmailExistException(String.format("Email already exists, %s", u.getEmailId()));
+				});
+
+		/* Get and Update User */
+		return this.userRepository.findByUsername(username).map(currentUser -> this.updateUser(user, currentUser))
+				.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
 	}
 }
