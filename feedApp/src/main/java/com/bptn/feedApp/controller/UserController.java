@@ -88,11 +88,12 @@ public class UserController {
 
 		this.userService.verifyEmail();
 	}
+
 	@GetMapping("/get")
 	public User getUser() {
-			
+
 		logger.debug("Getting User Data");
-			
+
 		return this.userService.getUser();
 	}
 
@@ -119,11 +120,20 @@ public class UserController {
 
 		this.userService.sendResetPasswordEmail(emailId);
 	}
+
 	@PostMapping("/reset")
 	public void passwordReset(@RequestBody JsonNode json) {
 
 		logger.debug("Resetting Password, password: {}", json.get("password").asText());
 
 		this.userService.resetPassword(json.get("password").asText());
+	}
+
+	@PostMapping("/update")
+	public User updateUser(@RequestBody User user) {
+
+		logger.debug("Updating User Data");
+
+		return this.userService.updateUser(user);
 	}
 }
