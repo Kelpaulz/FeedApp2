@@ -88,6 +88,13 @@ public class UserController {
 
 		this.userService.verifyEmail();
 	}
+	@GetMapping("/get")
+	public User getUser() {
+			
+		logger.debug("Getting User Data");
+			
+		return this.userService.getUser();
+	}
 
 	@PostMapping("/login")
 	public ResponseEntity<User> login(@RequestBody User user) {
