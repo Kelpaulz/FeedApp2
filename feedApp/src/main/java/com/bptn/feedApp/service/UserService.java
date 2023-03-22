@@ -154,15 +154,24 @@ public class UserService {
 
 		return headers;
 	}
+
 	public void resetPassword(String password) {
 
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
 		User user = this.userRepository.findByUsername(username)
-					.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s",username)));
+				.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
 
 		user.setPassword(this.passwordEncoder.encode(password));
 
 		this.userRepository.save(user);
+	}
+	public User getUser() {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		/* Get User from the DB. */
+		return this.userRepository.findByUsername(username)
+	.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s",username)));
 	}
 }
