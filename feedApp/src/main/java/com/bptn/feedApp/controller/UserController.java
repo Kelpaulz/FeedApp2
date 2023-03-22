@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bptn.feedApp.jpa.User;
 import com.bptn.feedApp.service.UserService;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @CrossOrigin(exposedHeaders = "Authorization")
 @RestController
@@ -40,14 +41,14 @@ public class UserController {
 	@GetMapping("/")
 	public List<User> listUsers() {
 //	public List<UserBean> listUsers() {
-	
+
 		logger.debug("The listUsers() method was invoked!");
 		return this.userService.listUsers();
 	}
 
 	@GetMapping("/{username}")
 	public Optional<User> findByUsername(@PathVariable String username) {
-	//public UserBean findByUsername(@PathVariable String username) {
+		// public UserBean findByUsername(@PathVariable String username) {
 		logger.debug("The findByUsername() method was invoked!, username={}", username);
 		return this.userService.findByUsername(username);
 	}
@@ -55,7 +56,7 @@ public class UserController {
 	@GetMapping("/{first}/{last}/{username}/{password}/{phone}/{emailId}")
 	public String createUser(@PathVariable String first, @PathVariable String last, @PathVariable String username,
 			@PathVariable String password, @PathVariable String phone, @PathVariable String emailId) {
-		//UserBean user = new UserBean();
+		// UserBean user = new UserBean();
 		User user = new User();
 
 		user.setFirstName(first);
@@ -73,38 +74,49 @@ public class UserController {
 
 		return "User Created Successfully";
 	}
+
 	@PostMapping("/signup")
 	public User signup(@RequestBody User user) {
 		logger.debug("Signing up, username: {}", user.getUsername());
 		return this.userService.signup(user);
 	}
+
 	@GetMapping("/verify/email")
 	public void verifyEmail() {
-			
+
 		logger.debug("Verifying Email");
-			
+
 		this.userService.verifyEmail();
 	}
+
 	@PostMapping("/login")
 	public ResponseEntity<User> login(@RequestBody User user) {
-		
+
 		logger.debug("Authenticating, username: {}, password: {}", user.getUsername(), user.getPassword());
-			
+
 		/* Spring Security Authentication. */
 		user = this.userService.authenticate(user);
 
 		/* Generate JWT and HTTP Header */
 		HttpHeaders jwtHeader = this.userService.generateJwtHeader(user.getUsername());
-					
+
 		logger.debug("User Authenticated, username: {}", user.getUsername());
-			
+
 		return new ResponseEntity<>(user, jwtHeader, OK);
 	}
+
 	@GetMapping("/reset/{emailId}")
 	public void sendResetPasswordEmail(@PathVariable String emailId) {
-			
-			logger.debug("Sending Reset Password Email, emailId: {}", emailId);
-			
-			this.userService.sendResetPasswordEmail(emailId);
+
+		logger.debug("Sending Reset Password Email, emailId: {}", emailId);
+
+		this.userService.sendResetPasswordEmail(emailId);
+	}
+	@PostMapping("/reset")
+	public void passwordReset(@RequestBody JsonNode json) {
+
+		logger.debug("Resetting Password, password: {}", json.get("password").asText());
+
+		this.userService.resetPassword(json.get("password").asText());
 	}
 }
