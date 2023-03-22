@@ -1,4 +1,5 @@
 package com.bptn.feedApp.service;
+
 import java.sql.Timestamp;
 
 import java.time.Instant;
@@ -30,45 +31,47 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Service
 public class UserService {
-	
+
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 //	@Autowired
 //	UserDao userDao;
 	@Autowired
 	UserRepository userRepository;
-	    
+
 	@Autowired
 	EmailService emailService;
-	
+
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	JwtService jwtService;
 
 	@Autowired
 	ResourceProvider provider;
-	
+
 //	public List<UserBean> listUsers() {
 	public List<User> listUsers() {
 //		return this.userDao.listUsers();
 		return this.userRepository.findAll();
 	}
-	//public UserBean findByUsername(String username) {
-		//return this.userDao.findByUsername(username);
+
+	// public UserBean findByUsername(String username) {
+	// return this.userDao.findByUsername(username);
 	public Optional<User> findByUsername(String username) {
 		return this.userRepository.findByUsername(username);
-		
+
 	}
+
 //	public void createUser(UserBean user) {
 //		this.userDao.createUser(user);
 	public void createUser(User user) {
 		this.userRepository.save(user);
 	}
-	
+
 	public User signup(User user) {
 
 		user.setUsername(user.getUsername().toLowerCase());
@@ -85,7 +88,8 @@ public class UserService {
 		this.userRepository.save(user);
 		return user;
 
-}
+	}
+
 	private void validateUsernameAndEmail(String username, String emailId) {
 
 		this.userRepository.findByUsername(username).ifPresent(u -> {
@@ -96,7 +100,8 @@ public class UserService {
 			throw new EmailExistException(String.format("Email already exists, %s", u.getEmailId()));
 		});
 
-}
+	}
+
 	public void verifyEmail() {
 
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -107,7 +112,8 @@ public class UserService {
 		user.setEmailVerified(true);
 
 		this.userRepository.save(user);
-}
+	}
+
 	public void sendResetPasswordEmail(String emailId) {
 
 		Optional<User> opt = this.userRepository.findByEmailId(emailId);
@@ -118,19 +124,21 @@ public class UserService {
 			logger.debug("Email doesn't exist, {}", emailId);
 		}
 	}
+
 	private static User isEmailVerified(User user) {
-		 
+
 		if (user.getEmailVerified().equals(false)) {
-	        throw new EmailNotVerifiedException(String.format("Email requires verification, %s", user.getEmailId()));
-	    }	
-			
-	    return user;
+			throw new EmailNotVerifiedException(String.format("Email requires verification, %s", user.getEmailId()));
+		}
+
+		return user;
 	}
-	
+
 	private Authentication authenticate(String username, String password) {
 		return this.authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
 	}
+
 	public User authenticate(User user) {
 
 		/* Spring Security Authentication. */
@@ -139,10 +147,22 @@ public class UserService {
 		/* Get User from the DB. */
 		return this.userRepository.findByUsername(user.getUsername()).map(UserService::isEmailVerified).get();
 	}
+
 	public HttpHeaders generateJwtHeader(String username) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username,this.provider.getJwtExpiration()));
+		headers.add(AUTHORIZATION, this.jwtService.generateJwtToken(username, this.provider.getJwtExpiration()));
 
 		return headers;
+	}
+	public void resetPassword(String password) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+		User user = this.userRepository.findByUsername(username)
+					.orElseThrow(() -> new UserNotFoundException(String.format("Username doesn't exist, %s",username)));
+
+		user.setPassword(this.passwordEncoder.encode(password));
+
+		this.userRepository.save(user);
 	}
 }
