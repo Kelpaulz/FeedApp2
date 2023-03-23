@@ -13,7 +13,7 @@ import com.bptn.feedApp.service.FeedService;
 
 @CrossOrigin
 @RestController
-@RequestMapping
+@RequestMapping("/feeds")
 public class FeedController {
 	final Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
