@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +17,9 @@ import com.bptn.feedApp.jpa.Feed;
 import com.bptn.feedApp.jpa.User;
 import com.bptn.feedApp.repository.FeedRepository;
 import com.bptn.feedApp.repository.UserRepository;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 
 
@@ -56,6 +58,16 @@ public class FeedService {
 		             .orElseThrow(()-> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
 					
 		Page<Feed> paged = this.feedRepository.findByUser(user, PageRequest.of(pageNum, pageSize, Sort.by("feedId").descending()));
+			
+		return new PageResponse<Feed>(paged);
+	}
+	public PageResponse<Feed> getOtherUsersFeeds(int pageNum, int pageSize) {
+
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();		
+		User user = this.userRepository.findByUsername(username)
+		             .orElseThrow(()-> new UserNotFoundException(String.format("Username doesn't exist, %s", username)));
+					
+		Page<Feed> paged = this.feedRepository.findByUserNot(user, PageRequest.of(pageNum, pageSize, Sort.by("feedId").descending()));
 			
 		return new PageResponse<Feed>(paged);
 	}
