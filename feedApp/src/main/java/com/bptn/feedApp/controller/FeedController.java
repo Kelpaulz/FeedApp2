@@ -62,4 +62,5 @@ public class FeedController {
 			
 		return this.feedService.createFeedMetaData(feedId, meta);
 	}
+	
 }
