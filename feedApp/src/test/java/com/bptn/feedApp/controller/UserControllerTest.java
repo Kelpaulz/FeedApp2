@@ -236,4 +236,42 @@ public class UserControllerTest {
 	    assertTrue(opt.isPresent(), "User Should Exist");  
 
 	}
+    @Test
+    @Order(8)
+    public void resetPasswordEmailIntegrationTest() throws Exception {
+    	
+    	/* Check the Rest End Point Response */
+    	this.mockMvc.perform(MockMvcRequestBuilders.get("/user/reset/{email}",this.user.getEmailId()))
+    	                .andExpect(status().isOk());  	
+    }
+    @Test
+    @Order(9)
+    public void resetPasswordIntegrationTest() throws Exception {
+
+        /* Check if the User exists */
+        Optional<User> opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+
+        /* Check Initial Password */
+        assertTrue(this.passwordEncoder.matches(this.user.getPassword(), opt.get().getPassword()));
+
+        String jwt = String.format("Bearer %s", this.jwtService.generateJwtToken(this.user.getUsername(), 10_000));
+
+        /* Check the Rest End Point Response */
+        ObjectNode json = objectMapper.createObjectNode();
+        json.put("password", this.otherPassword);
+
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/reset")
+                .header(AUTHORIZATION, jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.toString()))
+                .andExpect(status().isOk());
+
+        /* Check if the User exists */
+        opt = this.userRepository.findByUsername(this.user.getUsername());
+        assertTrue(opt.isPresent(), "User Should Exist");
+
+        /* Check new Password */
+        assertTrue(this.passwordEncoder.matches(this.otherPassword, opt.get().getPassword()));
+    }
 }
