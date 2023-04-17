@@ -261,7 +261,7 @@ public class UserControllerTest {
         ObjectNode json = objectMapper.createObjectNode();
         json.put("password", this.otherPassword);
 
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/reset")
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/user/reset")
                 .header(AUTHORIZATION, jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.toString()))
